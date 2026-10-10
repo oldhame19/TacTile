@@ -20,17 +20,21 @@ public class TileSpawner : MonoBehaviour
 
     private void SpawnPlayerTiles()
     {
-        SpawnTileRow(playerOneZ, "Player1");
-        SpawnTileRow(playerTwoZ, "Player2");
+        SpawnTileRow(playerOneZ, PlayerId.Player1, "Player1");
+        SpawnTileRow(playerTwoZ, PlayerId.Player2, "Player2");
     }
 
-    private void SpawnTileRow(float zPosition, string playerName)
+    private void SpawnTileRow(
+        float zPosition,
+        PlayerId owner,
+        string playerName)
     {
-        float startX = -((tilesPerPlayer - 1) * tileSpacing) / 2f;
+        float startX =
+            -((tilesPerPlayer - 1) * tileSpacing) / 2f;
 
         for (int i = 0; i < tilesPerPlayer; i++)
         {
-            float xPosition = startX + (i * tileSpacing);
+            float xPosition = startX + i * tileSpacing;
 
             Vector3 position = new Vector3(
                 xPosition,
@@ -46,6 +50,21 @@ public class TileSpawner : MonoBehaviour
             );
 
             tile.name = $"{playerName}_Tile_{i}";
+
+            TileView tileView = tile.GetComponent<TileView>();
+
+            if (tileView == null)
+            {
+                Debug.LogError(
+                    "Tile prefab needs TileView.cs",
+                    tile
+                );
+
+                continue;
+            }
+
+            // The GameDriver connects the tiles after scene setup.
+            tileView.Initialize(owner, null);
         }
     }
 }
