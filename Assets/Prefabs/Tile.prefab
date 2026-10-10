@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 2248674653031377166}
   - component: {fileID: 5722241181527261162}
   - component: {fileID: -3126726844617270919}
+  - component: {fileID: 2718454541691752907}
   m_Layer: 0
   m_Name: Tile
   m_TagString: Untagged
@@ -108,7 +109,7 @@ BoxCollider:
     m_Bits: 0
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
-  m_ProvidesContacts: 0
+  m_ProvidesContacts: 1
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
@@ -131,3 +132,15 @@ MonoBehaviour:
   leftStrength: 0
   tickPrefab: {fileID: 5145166681678448594, guid: c48e7c9aa2f6d3f43a88a8055580afa7, type: 3}
   tickSpacing: 0.2
+--- !u!114 &2718454541691752907
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8053936220073287214}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 891f35e0b0578c34ab21dc04975f468d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TileView
