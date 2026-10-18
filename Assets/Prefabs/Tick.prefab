@@ -128,4 +128,4 @@ MonoBehaviour:
   tickRenderer: {fileID: 4933110307986916753}
   redColor: {r: 1, g: 0, b: 0, a: 1}
   lightBlueColor: {r: 0, g: 0, b: 1, a: 1}
-  yellowColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  yellowColor: {r: 0.1960784, g: 0.8039216, b: 0.1960784, a: 1}
