@@ -144,3 +144,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 891f35e0b0578c34ab21dc04975f468d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TileView
+  tileRenderer: {fileID: 2248674653031377166}
+  playerOneColor: {r: 1, g: 1, b: 1, a: 1}
+  playerTwoColor: {r: 0, g: 0, b: 0, a: 1}
