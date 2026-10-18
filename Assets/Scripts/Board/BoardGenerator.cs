@@ -4,7 +4,7 @@ public class BoardGenerator : MonoBehaviour
 {
     [Header("Board Settings")]
     [SerializeField] private GameObject boardSquarePrefab;
-    [SerializeField] private int boardSize = 4;
+    [SerializeField] private int boardSize = 5;
     [SerializeField] private float squareSpacing = 2f;
 
     private void Start()

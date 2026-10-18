@@ -1,5 +1,5 @@
-using UnityEngine;
 
+using UnityEngine;
 
 public class TileGenerator : MonoBehaviour
 {
@@ -11,13 +11,25 @@ public class TileGenerator : MonoBehaviour
 
     [Header("Tick Settings")]
     [SerializeField] private GameObject tickPrefab;
-
     [SerializeField] private float tickSpacing = 0.8f;
+
+    private TickColor tileTickColor;
+    private bool ticksGenerated;
 
     private void Awake()
     {
         RandomizeStrengths();
+    }
+
+    public void InitializeTickColor(TickColor color)
+    {
+        tileTickColor = color;
+
+        if (ticksGenerated)
+            return;
+
         GenerateTicks();
+        ticksGenerated = true;
     }
 
     private void RandomizeStrengths()
@@ -83,6 +95,21 @@ public class TileGenerator : MonoBehaviour
             tick.transform.localRotation = rotation;
 
             tick.name = $"{edge}_Tick_{i + 1}";
+
+            TickView tickView = tick.GetComponent<TickView>();
+
+            if (tickView == null)
+            {
+                Debug.LogError(
+                    "Tick prefab needs TickView.cs",
+                    tick
+                );
+
+                continue;
+            }
+
+            // Every tick on this tile receives the same color.
+            tickView.Initialize(tileTickColor);
         }
     }
 
