@@ -15,7 +15,10 @@ public class TileGenerator : MonoBehaviour
 
     private TickColor tileTickColor;
     private bool ticksGenerated;
-
+    public TickColor TileTickColor
+    {
+        get { return tileTickColor; }
+    }
     private void Awake()
     {
         RandomizeStrengths();

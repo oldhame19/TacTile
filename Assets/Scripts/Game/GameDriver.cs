@@ -1,3 +1,4 @@
+
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,6 +12,14 @@ public class GameDriver : MonoBehaviour
     public GameState State
     {
         get { return state; }
+    }
+
+    private enum TileSide
+    {
+        Top,
+        Right,
+        Bottom,
+        Left
     }
 
     private void Awake()
@@ -27,7 +36,6 @@ public class GameDriver : MonoBehaviour
     {
         state = new GameState();
 
-        // BoardGenerator and TileSpawner run before this driver.
         BoardSpace[] spaces = FindObjectsOfType<BoardSpace>();
         TileView[] tiles = FindObjectsOfType<TileView>();
 
@@ -38,7 +46,6 @@ public class GameDriver : MonoBehaviour
 
         foreach (TileView tile in tiles)
         {
-            // Reconnect each tile to the driver while preserving ownership.
             tile.Initialize(tile.Owner, this);
             state.AllTiles.Add(tile);
         }
@@ -120,7 +127,9 @@ public class GameDriver : MonoBehaviour
             if (action.Type == GameActionType.PlaceTile &&
                 action.Space == space)
             {
-                if (!space.TryPlaceTile(action.Tile))
+                TileView placedTile = action.Tile;
+
+                if (!space.TryPlaceTile(placedTile))
                 {
                     Debug.LogWarning(
                         "Placement failed: the space is occupied."
@@ -131,9 +140,12 @@ public class GameDriver : MonoBehaviour
 
                 Debug.Log(
                     state.CurrentPlayer + " placed " +
-                    action.Tile.name + " at [" +
+                    placedTile.name + " at [" +
                     space.Row + "," + space.Column + "]"
                 );
+
+                // Resolve captures immediately after placement.
+                ResolveCaptures(placedTile, space);
 
                 if (TurnStateMachine.Advance(state))
                 {
@@ -150,6 +162,186 @@ public class GameDriver : MonoBehaviour
             space.Column + "]. Current phase: " +
             state.CurrentPhase
         );
+    }
+
+    private void ResolveCaptures(
+        TileView placedTile,
+        BoardSpace placedSpace)
+    {
+        if (placedTile == null || placedSpace == null)
+        {
+            return;
+        }
+
+        // Rows increase toward positive Z in BoardGenerator.
+        // Columns increase toward positive X.
+        CheckAdjacentCapture(
+            placedTile,
+            placedSpace.Row + 1,
+            placedSpace.Column,
+            TileSide.Top,
+            TileSide.Bottom
+        );
+
+        CheckAdjacentCapture(
+            placedTile,
+            placedSpace.Row,
+            placedSpace.Column + 1,
+            TileSide.Right,
+            TileSide.Left
+        );
+
+        CheckAdjacentCapture(
+            placedTile,
+            placedSpace.Row - 1,
+            placedSpace.Column,
+            TileSide.Bottom,
+            TileSide.Top
+        );
+
+        CheckAdjacentCapture(
+            placedTile,
+            placedSpace.Row,
+            placedSpace.Column - 1,
+            TileSide.Left,
+            TileSide.Right
+        );
+    }
+
+    private void CheckAdjacentCapture(
+        TileView attackingTile,
+        int targetRow,
+        int targetColumn,
+        TileSide attackingSide,
+        TileSide defendingSide)
+    {
+        BoardSpace adjacentSpace = state.BoardSpaces.Find(
+            candidate =>
+                candidate != null &&
+                candidate.Row == targetRow &&
+                candidate.Column == targetColumn
+        );
+
+        // There is no space here, or the space is empty.
+        if (adjacentSpace == null ||
+            !adjacentSpace.IsOccupied)
+        {
+            return;
+        }
+
+        TileView defendingTile = adjacentSpace.OccupyingTile;
+
+        // Only capture opposing tiles.
+        if (defendingTile == null ||
+            defendingTile.Owner == attackingTile.Owner)
+        {
+            return;
+        }
+
+        int attackingStrength = GetEffectiveStrength(
+            attackingTile,
+            attackingSide
+        );
+
+        int defendingStrength = GetEffectiveStrength(
+            defendingTile,
+            defendingSide
+        );
+
+        Debug.Log(
+            "Comparing " + attackingTile.name + " (" +
+            attackingSide + ": " + attackingStrength +
+            ") against " + defendingTile.name + " (" +
+            defendingSide + ": " + defendingStrength + ")"
+        );
+
+        // Equal strength does not capture.
+        if (attackingStrength > defendingStrength)
+        {
+            PlayerId previousOwner = defendingTile.Owner;
+
+            defendingTile.SetOwner(attackingTile.Owner);
+
+            Debug.Log(
+                attackingTile.name + " captured " +
+                defendingTile.name + " from " +
+                previousOwner + ". New owner: " +
+                defendingTile.Owner
+            );
+        }
+    }
+
+    private int GetEffectiveStrength(
+        TileView tile,
+        TileSide side)
+    {
+        TileGenerator generator =
+            tile.GetComponent<TileGenerator>();
+
+        if (generator == null)
+        {
+            Debug.LogError(
+                "Tile is missing TileGenerator: " + tile.name,
+                tile
+            );
+
+            return 0;
+        }
+
+        int baseStrength;
+
+        switch (side)
+        {
+            case TileSide.Top:
+                baseStrength = generator.topStrength;
+                break;
+
+            case TileSide.Right:
+                baseStrength = generator.rightStrength;
+                break;
+
+            case TileSide.Bottom:
+                baseStrength = generator.bottomStrength;
+                break;
+
+            case TileSide.Left:
+                baseStrength = generator.leftStrength;
+                break;
+
+            default:
+                return 0;
+        }
+
+        // A tile receives its boost while occupying a boost space.
+        BoardSpace currentSpace = tile.CurrentSpace;
+
+        if (currentSpace == null || !currentSpace.IsBoostSpace)
+        {
+            return baseStrength;
+        }
+
+        BoostType boost = currentSpace.Boost;
+
+        // The neutral center boost applies to every tick color.
+        if (boost == BoostType.Neutral)
+        {
+            return baseStrength + 1;
+        }
+
+        // Colored boosts apply only to matching tile tick colors.
+        bool matchingColor =
+            (boost == BoostType.Red &&
+             generator.TileTickColor == TickColor.Red) ||
+
+            (boost == BoostType.LightBlue &&
+             generator.TileTickColor == TickColor.LightBlue) ||
+
+            (boost == BoostType.Yellow &&
+             generator.TileTickColor == TickColor.Yellow);
+
+        return matchingColor
+            ? baseStrength + 1
+            : baseStrength;
     }
 
     private void AdvanceAutomaticPhases()
