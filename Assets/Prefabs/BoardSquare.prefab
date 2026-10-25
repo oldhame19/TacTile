@@ -125,3 +125,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 576900bd843c4d04e8d2149d6a3fca35, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BoardSpace
+  spaceRenderer: {fileID: 0}
+  neutralColor: {r: 0.6, g: 0.2, b: 0.8, a: 1}
+  redColor: {r: 1, g: 0, b: 0, a: 1}
+  lightBlueColor: {r: 0, g: 0, b: 1, a: 1}
+  yellowColor: {r: 0.1960784, g: 0.8039216, b: 0.1960784, a: 1}
