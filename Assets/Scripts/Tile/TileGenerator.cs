@@ -37,10 +37,25 @@ public class TileGenerator : MonoBehaviour
 
     private void RandomizeStrengths()
     {
-        topStrength = Random.Range(0, 5);
-        rightStrength = Random.Range(0, 5);
-        bottomStrength = Random.Range(0, 5);
-        leftStrength = Random.Range(0, 5);
+        // Each tile must have 7-9 total ticks, while each side can
+        // independently have 0-4 ticks. Re-roll until the combination
+        // falls within the allowed total, keeping side distributions random.
+        int totalTicks;
+
+        do
+        {
+            topStrength = Random.Range(0, 5);
+            rightStrength = Random.Range(0, 5);
+            bottomStrength = Random.Range(0, 5);
+            leftStrength = Random.Range(0, 5);
+
+            totalTicks =
+                topStrength +
+                rightStrength +
+                bottomStrength +
+                leftStrength;
+        }
+        while (totalTicks < 7 || totalTicks > 9);
     }
 
     private void GenerateTicks()
