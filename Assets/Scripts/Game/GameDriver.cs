@@ -83,7 +83,9 @@ public class GameDriver : MonoBehaviour
         {
             if (tile.Owner == state.CurrentPlayer && !tile.IsPlaced)
             {
+                state.SelectedTile?.SetSelected(false);
                 state.SelectedTile = tile;
+                state.SelectedTile.SetSelected(true);
 
                 Debug.Log(
                     state.CurrentPlayer + " changed selection to " +
