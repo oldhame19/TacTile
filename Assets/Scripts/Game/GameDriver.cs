@@ -117,6 +117,7 @@ public class GameDriver : MonoBehaviour
                 action.Tile == tile)
             {
                 state.SelectedTile = tile;
+                state.SelectedTile.SetSelected(true);
 
                 Debug.Log(
                     state.CurrentPlayer + " selected " + tile.name
