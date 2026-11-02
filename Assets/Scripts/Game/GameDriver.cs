@@ -76,6 +76,35 @@ public class GameDriver : MonoBehaviour
             return;
         }
 
+        // Allow the active player to change their selected tile before
+        // placing it. Selection is still restricted to their own
+        // unplaced tiles.
+        if (state.CurrentPhase == TurnPhase.PlaceTile)
+        {
+            if (tile.Owner == state.CurrentPlayer && !tile.IsPlaced)
+            {
+                state.SelectedTile?.SetSelected(false);
+                state.SelectedTile = tile;
+                state.SelectedTile.SetSelected(true);
+
+                Debug.Log(
+                    state.CurrentPlayer + " changed selection to " +
+                    tile.name
+                );
+
+                // Stay in PlaceTile; the next placement uses this tile.
+                LogCurrentPhase();
+                return;
+            }
+
+            Debug.Log(
+                "Illegal selection: " + tile.name +
+                ". Only unplaced tiles belonging to " +
+                state.CurrentPlayer + " can be selected."
+            );
+            return;
+        }
+
         List<LegalAction> actions =
             LegalMoveGenerator.GetLegalActions(
                 state,
@@ -88,6 +117,7 @@ public class GameDriver : MonoBehaviour
                 action.Tile == tile)
             {
                 state.SelectedTile = tile;
+                state.SelectedTile.SetSelected(true);
 
                 Debug.Log(
                     state.CurrentPlayer + " selected " + tile.name
