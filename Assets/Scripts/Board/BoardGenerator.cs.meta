@@ -1,2 +1,13 @@
 fileFormatVersion: 2
 guid: f2a8930167f87cd4780b18acd3d9765f
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - boardSquarePrefab: {instanceID: 0}
+  - balanceConfig: {fileID: 11400000, guid: 41ec694ed92761547bc75b4580647b44, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
