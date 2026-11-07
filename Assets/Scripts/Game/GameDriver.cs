@@ -6,6 +6,7 @@ using UnityEngine;
 public class GameDriver : MonoBehaviour
 {
     public static GameDriver Instance { get; private set; }
+    [SerializeField] private GameBalanceConfig balanceConfig;
 
     private GameState state;
 
@@ -355,7 +356,7 @@ public class GameDriver : MonoBehaviour
         // The neutral center boost applies to every tick color.
         if (boost == BoostType.Neutral)
         {
-            return baseStrength + 1;
+            return baseStrength + balanceConfig.neutralBoostBonus;
         }
 
         // Colored boosts apply only to matching tile tick colors.
@@ -370,7 +371,7 @@ public class GameDriver : MonoBehaviour
              generator.TileTickColor == TickColor.Yellow);
 
         return matchingColor
-            ? baseStrength + 1
+            ? baseStrength + balanceConfig.matchingColorBoostBonus
             : baseStrength;
     }
 

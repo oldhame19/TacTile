@@ -6,11 +6,11 @@ public class BoardGenerator : MonoBehaviour
 {
     [Header("Board Settings")]
     [SerializeField] private GameObject boardSquarePrefab;
-    [SerializeField] private int boardSize = 5;
+    [SerializeField] private GameBalanceConfig balanceConfig;
+   
     [SerializeField] private float squareSpacing = 2f;
 
-    [Header("Boost Settings")]
-    [SerializeField] private int boostsPerColor = 2;
+    
 
     private void Start()
     {
@@ -19,14 +19,20 @@ public class BoardGenerator : MonoBehaviour
 
     private void GenerateBoard()
     {
+        if (balanceConfig == null)
+        {
+            Debug.LogError("GameBalanceConfig is not assigned.", this);
+            return;
+        }
+
         float boardOffset =
-            (boardSize - 1) * squareSpacing / 2f;
+            (balanceConfig.boardSize - 1) * squareSpacing / 2f;
 
         List<BoardSpace> spaces = new List<BoardSpace>();
 
-        for (int row = 0; row < boardSize; row++)
+        for (int row = 0; row < balanceConfig.boardSize; row++)
         {
-            for (int column = 0; column < boardSize; column++)
+            for (int column = 0; column < balanceConfig.boardSize; column++)
             {
                 float x = column * squareSpacing - boardOffset;
                 float z = row * squareSpacing - boardOffset;
@@ -66,7 +72,7 @@ public class BoardGenerator : MonoBehaviour
 
     private void AssignBoostSpaces(List<BoardSpace> spaces)
     {
-        if (boardSize < 3)
+        if (balanceConfig.boardSize < 3)
         {
             Debug.LogError(
                 "Board must be at least 3x3 for a center boost."
@@ -75,8 +81,8 @@ public class BoardGenerator : MonoBehaviour
             return;
         }
 
-        int centerRow = boardSize / 2;
-        int centerColumn = boardSize / 2;
+        int centerRow = balanceConfig.boardSize / 2;
+        int centerColumn = balanceConfig.boardSize / 2;
 
         BoardSpace centerSpace = spaces.Find(space =>
             space.Row == centerRow &&
@@ -113,9 +119,9 @@ public class BoardGenerator : MonoBehaviour
             BoostType.Yellow
         };
 
-        int requiredSpaces = boostsPerColor * boostTypes.Length;
+        int requiredSpaces = balanceConfig.boostsPerColor * boostTypes.Length;
 
-        if (boostsPerColor < 0 ||
+        if (balanceConfig.boostsPerColor < 0 ||
             availableSpaces.Count < requiredSpaces)
         {
             Debug.LogError(
@@ -129,7 +135,7 @@ public class BoardGenerator : MonoBehaviour
 
         foreach (BoostType boostType in boostTypes)
         {
-            for (int i = 0; i < boostsPerColor; i++)
+            for (int i = 0; i < balanceConfig.boostsPerColor; i++)
             {
                 availableSpaces[index].SetBoost(boostType);
                 index++;

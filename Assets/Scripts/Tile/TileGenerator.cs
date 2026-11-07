@@ -12,6 +12,7 @@ public class TileGenerator : MonoBehaviour
     [Header("Tick Settings")]
     [SerializeField] private GameObject tickPrefab;
     [SerializeField] private float tickSpacing = 0.8f;
+    private GameBalanceConfig balanceConfig;
 
     private TickColor tileTickColor;
     private bool ticksGenerated;
@@ -19,35 +20,49 @@ public class TileGenerator : MonoBehaviour
     {
         get { return tileTickColor; }
     }
-    private void Awake()
-    {
-        RandomizeStrengths();
-    }
 
-    public void InitializeTickColor(TickColor color)
+
+    public void InitializeTickColor(
+    TickColor color,
+    GameBalanceConfig config)
     {
         tileTickColor = color;
+        balanceConfig = config;
 
         if (ticksGenerated)
             return;
 
+        RandomizeStrengths();
         GenerateTicks();
+
         ticksGenerated = true;
     }
 
     private void RandomizeStrengths()
     {
-        // Each tile must have 7-9 total ticks, while each side can
-        // independently have 0-4 ticks. Re-roll until the combination
-        // falls within the allowed total, keeping side distributions random.
         int totalTicks;
 
         do
         {
-            topStrength = Random.Range(0, 5);
-            rightStrength = Random.Range(0, 5);
-            bottomStrength = Random.Range(0, 5);
-            leftStrength = Random.Range(0, 5);
+            topStrength = Random.Range(
+                balanceConfig.minimumSideStrength,
+                balanceConfig.maximumSideStrength + 1
+            );
+
+            rightStrength = Random.Range(
+                balanceConfig.minimumSideStrength,
+                balanceConfig.maximumSideStrength + 1
+            );
+
+            bottomStrength = Random.Range(
+                balanceConfig.minimumSideStrength,
+                balanceConfig.maximumSideStrength + 1
+            );
+
+            leftStrength = Random.Range(
+                balanceConfig.minimumSideStrength,
+                balanceConfig.maximumSideStrength + 1
+            );
 
             totalTicks =
                 topStrength +
@@ -55,7 +70,10 @@ public class TileGenerator : MonoBehaviour
                 bottomStrength +
                 leftStrength;
         }
-        while (totalTicks < 7 || totalTicks > 9);
+        while (
+            totalTicks < balanceConfig.minimumTotalTicks ||
+            totalTicks > balanceConfig.maximumTotalTicks
+        );
     }
 
     private void GenerateTicks()

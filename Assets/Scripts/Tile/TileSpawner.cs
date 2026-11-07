@@ -6,9 +6,7 @@ public class TileSpawner : MonoBehaviour
 {
     [Header("Tile")]
     [SerializeField] private GameObject tilePrefab;
-
-    [Header("Player Settings")]
-    [SerializeField] private int tilesPerPlayer = 8;
+    [SerializeField] private GameBalanceConfig balanceConfig;
 
     [Header("Layout")]
     [SerializeField] private float tileSpacing = 1.8f;
@@ -22,6 +20,12 @@ public class TileSpawner : MonoBehaviour
 
     private void SpawnPlayerTiles()
     {
+        if (balanceConfig == null)
+        {
+            Debug.LogError("GameBalanceConfig is not assigned!", this);
+            return;
+        }
+
         SpawnTileRow(playerOneZ, PlayerId.Player1, "Player1");
         SpawnTileRow(playerTwoZ, PlayerId.Player2, "Player2");
     }
@@ -32,12 +36,12 @@ public class TileSpawner : MonoBehaviour
         string playerName)
     {
         float startX =
-            -((tilesPerPlayer - 1) * tileSpacing) / 2f;
+            -((balanceConfig.tilesPerPlayer - 1) * tileSpacing) / 2f;
 
         // Give each player a balanced distribution of colors.
         List<TickColor> colors = CreateBalancedColors();
 
-        for (int i = 0; i < tilesPerPlayer; i++)
+        for (int i = 0; i < balanceConfig.tilesPerPlayer; i++)
         {
             float xPosition = startX + i * tileSpacing;
 
@@ -69,7 +73,10 @@ public class TileSpawner : MonoBehaviour
             }
             else
             {
-                tileGenerator.InitializeTickColor(colors[i]);
+                tileGenerator.InitializeTickColor(
+                    colors[i],
+                    balanceConfig
+                );
             }
 
             TileView tileView = tile.GetComponent<TileView>();
@@ -96,7 +103,7 @@ public class TileSpawner : MonoBehaviour
         // Rotate the starting color so the distribution can vary.
         int startingColor = Random.Range(0, 3);
 
-        for (int i = 0; i < tilesPerPlayer; i++)
+        for (int i = 0; i < balanceConfig.tilesPerPlayer; i++)
         {
             TickColor color = (TickColor)(
                 (i + startingColor) % 3
