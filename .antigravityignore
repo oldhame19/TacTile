@@ -1,0 +1,12 @@
+# Unity-generated folders
+Library/
+Temp/
+Obj/
+Logs/
+Build/
+Builds/
+UserSettings/
+
+# IDE-generated folders
+.vs/
+.idea/
