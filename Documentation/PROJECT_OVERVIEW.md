@@ -74,11 +74,15 @@ Effective strength is computed by [GameDriver.GetEffectiveStrength()](file:///C:
 
 ---
 
-## 4. Current Implemented Features
+## 4. Current Features vs. Required University Deliverables
+
+To ensure total clarity regarding project progress, this section strictly separates **currently implemented functionality** from **planned, required deliverables**.
+
+### A. Currently Implemented & Verified Functionality
 
 | Feature | Implementation Component | Status |
 | :--- | :--- | :--- |
-| **5x5 Grid Generation** | [BoardGenerator.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Board/BoardGenerator.cs) | Fully functional; centered grid, procedural coordinates. |
+| **5x5 Grid Generation** | [BoardGenerator.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Board/BoardGenerator.cs) | Fully functional; centered 5x5 grid, procedural coordinates. |
 | **Boost Space Assignment** | [BoardGenerator.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Board/BoardGenerator.cs) | Fully functional; 1 center neutral + 6 randomized colored boosts. |
 | **Tile Spawning & Allocation** | [TileSpawner.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Tile/TileSpawner.cs) | Fully functional; 13 tiles per player spawned in racks. |
 | **Procedural Tick Generation** | [TileGenerator.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Tile/TileGenerator.cs) | Fully functional; side strengths (0-4), tick budget (7-9), balanced colors. |
@@ -89,6 +93,18 @@ Effective strength is computed by [GameDriver.GetEffectiveStrength()](file:///C:
 | **Edge Combat & Captures** | [GameDriver.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Game/GameDriver.cs) | Fully functional; 4-way orthogonal combat with neutral and color boost logic. |
 | **Scoreboard & Turn Indicator** | [ScoreboardUI.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Game/ScoreboardUI.cs) | Fully functional; live score tally and active player name highlight. |
 
+### B. Planned & Required University Deliverables (Not Yet Implemented)
+
+| Deliverable | Target System | Scope & Description |
+| :--- | :--- | :--- |
+| **Game-Over Hook** | [GameDriver.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Game/GameDriver.cs) | Evaluate `state.IsGameOver` to halt input and trigger the end-of-game sequence. |
+| **Fleshed-Out Victory Screen** | Canvas UI Overlay | Complete end-game overlay with winner announcement, match summary, "Play Again" (match restart), and "Return to Menu". |
+| **Main Menu & Rules Views** | Scene / Canvas Navigation | Main menu screen with **Play**, **Settings**, and **Rules** views. |
+| **In-Game Balance Settings** | Settings UI & Config Runtime | Expose all 9 `GameBalanceConfig` variables in UI with immutable Inspector defaults, runtime cloning, session persistence, and reset functionality. |
+| **Tick Validation & Freeze Safeguard** | UI Validation & [TileGenerator.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Tile/TileGenerator.cs) | Joint mathematical feasibility checks with clear UI rejection messages, plus a hard maximum-attempt loop safeguard in code. |
+| **Visual Cue for Boosted Tiles** | [TileView.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Tile/TileView.cs) / [TickView.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Tile/TickView.cs) | Non-obscuring visual indicator (glow or pulse) on tiles receiving an active boost. |
+| **In-Game Action Feedback** | [BoardSpace.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Board/BoardSpace.cs) / [TileView.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Tile/TileView.cs) | Visual cues (e.g., flash/shake) for illegal selections or occupied placements. |
+
 ---
 
 ## 5. Intentional Design Decisions and Known Limitations
@@ -98,8 +114,9 @@ Effective strength is computed by [GameDriver.GetEffectiveStrength()](file:///C:
 2. **Tile Count (13 per player):** Each player receives 13 tiles. The board contains 25 playable spaces, including the center neutral purple boost space. Therefore, when the board is full, exactly one tile remains unused overall. Which player retains that tile depends on placement order.
 3. **Local Combat:** Captures do not trigger chain flips, keeping gameplay deterministic, transparent, and easy to calculate mentally for players.
 
-### Known Limitations in Current Build
-1. **Missing Game-Over Sequence:** While [GameState.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Game/GameState.cs#L57-L65) defines `IsGameOver`, the condition is never evaluated by `GameDriver`. When the board fills, the game logs `(No legal actions available.)` and halts without announcing a winner.
-2. **Missing Victory & Retry UI:** There is no end-game results panel, winner banner, or restart/rematch button.
-3. **Console-Only Move Validation Feedback:** Illegal selections or placements log warnings to `Debug.Log`, but provide no in-game visual feedback (e.g., error toasts or sound effects).
-4. **Desktop Click Input Only:** Tile selection and placement rely on Unity's 3D physics `OnMouseDown()` events on BoxColliders, with no touch-specific or drag-and-drop gesture support.
+### Current Gaps & Required Additions (Before University Submission)
+1. **Missing Game-Over Sequence & Victory Screen:** `GameState.IsGameOver` is not evaluated in `GameDriver`. The required Fleshed-Out Victory Screen must be implemented with winner announcement, scores, "Play Again", and "Return to Menu".
+2. **Missing Main Menu & Settings Interface:** Players cannot access rules or customize balance variables without opening the Unity Inspector. The required Main Menu, Rules, and Settings system must be built with joint tick validation.
+3. **Missing Boost Visual Cues:** Boost calculations occur entirely in code without visual indication on the boosted tile.
+4. **Console-Only Move Validation Feedback:** Illegal actions log warnings to `Debug.Log` rather than giving in-game feedback.
+5. **Desktop Click Input Only:** Relies on 3D BoxCollider `OnMouseDown()` events (sufficient for desktop deliverable; mobile gesture enhancements deferred to Phase 2).

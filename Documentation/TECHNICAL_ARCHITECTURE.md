@@ -49,26 +49,106 @@ Assets/
 
 ## 3. Important Scripts, Classes, and Responsibilities
 
-| Class / File | Type | Architectural Pattern | Primary Responsibilities |
+This table clearly distinguishes between **currently implemented functionality** and **planned architecture** for upcoming required deliverables:
+
+| Class / File | Status | Architectural Role | Current & Planned Responsibilities |
 | :--- | :--- | :--- | :--- |
-| [GameDriver.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Game/GameDriver.cs) | `MonoBehaviour` | Singleton Controller | Central coordinator with `[DefaultExecutionOrder(1000)]`. Populates `GameState`, handles tile selection, coordinates placement, executes combat calculations, and drives turn phases. |
-| [GameState.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Game/GameState.cs) | Pure C# Class | Domain Model | Holds runtime game state: `CurrentPlayer`, `CurrentPhase`, `SelectedTile`, `BoardSpaces`, `AllTiles`, and `CompletedTurns`. Provides helper queries (`GetPlayerTiles`, `GetEmptySpaces`, `IsGameOver`). |
-| [TurnStateMachine.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Game/TurnStateMachine.cs) | `static class` | State Machine Logic | Controls valid transitions: `BeginTurn` $\to$ `SelectTile` $\to$ `PlaceTile` $\to$ `EndTurn` $\to$ `BeginTurn`. Toggles active player and increments completed turn counter. |
-| [LegalMoveGenerator.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Game/LegalMoveGenerator.cs) | `static class` | Rule Engine | Computes legal moves for a given player based on turn phase, returning a `List<LegalAction>`. |
-| [BoardGenerator.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Board/BoardGenerator.cs) | `MonoBehaviour` | World Builder | Instantiates the $5 \times 5$ board grid at `Start()`, calculates centered world coordinates, and distributes the 1 neutral and 6 colored boost spaces. |
-| [BoardSpace.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Board/BoardSpace.cs) | `MonoBehaviour` | View / Component | Sits on each cell prefab. Stores `Row`, `Column`, `OccupyingTile`, `BoostType`. Listens for clicks via `OnMouseDown()`, notifies `GameDriver`, and handles tile reparenting upon placement. |
-| [TileSpawner.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Tile/TileSpawner.cs) | `MonoBehaviour` | Spawner | Spawns 13 tiles for each player at `Start()`. Ensures balanced tick colors across each player's rack. |
-| [TileGenerator.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Tile/TileGenerator.cs) | `MonoBehaviour` | Procedural Generator | Generates random edge strengths ($0-4$) summing to $7-9$ total ticks. Instantiates `Tick.prefab` objects around tile edges. |
-| [TileView.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Tile/TileView.cs) | `MonoBehaviour` | View / Component | Manages visual representation (white for P1, black for P2), tracks placement status, runs selection wobble coroutine (`Jiggle()`), and listens for clicks via `OnMouseDown()`. |
-| [TickView.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Tile/TickView.cs) | `MonoBehaviour` | View / Component | Colors individual tick meshes using `MaterialPropertyBlock` for `Red`, `LightBlue`, or `Yellow`. |
-| [ScoreboardUI.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Game/ScoreboardUI.cs) | `MonoBehaviour` | View / UI Controller | Polls placed tile ownership each frame in `Update()`, updates TMP score text, and highlights the active player's name. |
-| [GameBalanceConfig.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Config/GameBalanceConfig.cs) | `ScriptableObject` | Data Container | Holds configurable balance values (`boardSize = 5`, `boostsPerColor = 2`, `tilesPerPlayer = 13`, tick constraints, boost bonuses). |
+| [GameDriver.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Game/GameDriver.cs) | Implemented | Singleton Controller | Central coordinator with `[DefaultExecutionOrder(1000)]`. Populates `GameState`, handles tile selection, coordinates placement, executes combat calculations, and drives turn phases. *Planned:* Evaluate `state.IsGameOver` to invoke victory flow. |
+| [GameState.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Game/GameState.cs) | Implemented | Domain Model | Holds runtime game state: `CurrentPlayer`, `CurrentPhase`, `SelectedTile`, `BoardSpaces`, `AllTiles`, and `CompletedTurns`. Provides helper queries (`GetPlayerTiles`, `GetEmptySpaces`, `IsGameOver`). |
+| [TurnStateMachine.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Game/TurnStateMachine.cs) | Implemented | State Machine Logic | Controls valid transitions: `BeginTurn` $\to$ `SelectTile` $\to$ `PlaceTile` $\to$ `EndTurn` $\to$ `BeginTurn`. Toggles active player and increments completed turn counter. *Planned:* Add terminal `GameOver` phase. |
+| [LegalMoveGenerator.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Game/LegalMoveGenerator.cs) | Implemented | Rule Engine | Computes legal moves for a given player based on turn phase, returning a `List<LegalAction>`. |
+| [BoardGenerator.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Board/BoardGenerator.cs) | Implemented | World Builder | Instantiates the board grid at `Start()`, calculates centered world coordinates, and distributes 1 neutral and 6 colored boost spaces based on config. |
+| [BoardSpace.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Board/BoardSpace.cs) | Implemented | View / Component | Sits on each cell prefab. Stores `Row`, `Column`, `OccupyingTile`, `BoostType`. Listens for clicks via `OnMouseDown()`, notifies `GameDriver`, and handles tile reparenting upon placement. |
+| [TileSpawner.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Tile/TileSpawner.cs) | Implemented | Spawner | Spawns tiles for each player at `Start()`. Ensures balanced tick colors across each player's rack based on config. |
+| [TileGenerator.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Tile/TileGenerator.cs) | Implemented | Procedural Generator | Generates random edge strengths ($0-4$) summing to $7-9$ total ticks. Instantiates `Tick.prefab` objects around tile edges. *Planned:* Maximum-attempt loop safeguard to prevent freezes. |
+| [TileView.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Tile/TileView.cs) | Implemented | View / Component | Manages visual representation (white for P1, black for P2), tracks placement status, runs selection wobble coroutine (`Jiggle()`), and listens for clicks via `OnMouseDown()`. *Planned:* Visual boost indicator controller. |
+| [TickView.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Tile/TickView.cs) | Implemented | View / Component | Colors individual tick meshes using `MaterialPropertyBlock` for `Red`, `LightBlue`, or `Yellow`. *Planned:* Glow/luminance effect when tile is boosted. |
+| [ScoreboardUI.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Game/ScoreboardUI.cs) | Implemented | View / UI Controller | Polls placed tile ownership each frame in `Update()`, updates TMP score text, and highlights the active player's name. |
+| [GameBalanceConfig.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Config/GameBalanceConfig.cs) | Implemented | ScriptableObject Schema | Defines all 9 game balance variables. *Planned:* Runtime in-memory cloning architecture for UI-driven customization. |
+| `MainMenuUI` | Planned | UI Navigation Controller | Manages Main Menu navigation across **Play**, **Settings**, and **Rules** views. |
+| `VictoryScreenUI` | Planned | UI Overlay Controller | Displays winner announcement, match summary, "Play Again" (match restart), and "Return to Menu". |
+| `SettingsUI` | Planned | UI Settings Controller | Exposes all 9 balance variables in UI, performs joint tick validation, displays error feedback, and handles "Reset to Defaults". |
 
 ---
 
-## 4. Game Initialization Sequence
+## 4. Game Balance Configuration & Runtime Architecture
 
-Because multiple systems instantiate objects at runtime, initialization order is strictly governed by Unity's execution lifecycle:
+### The 9 Balance Variables in [GameBalanceConfig.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Config/GameBalanceConfig.cs)
+
+All 9 variables present in source code must be exposed in the planned Settings UI:
+
+| Category | Variable Name | Type | Default Value | Gameplay Role & Reinitialization Scope |
+| :--- | :--- | :--- | :--- | :--- |
+| **Board** | `boardSize` | `int` | `5` (Min: 3) | Defines row and column dimensions ($N \times N$). **Requires complete board regeneration.** Cannot apply mid-match. |
+| **Board** | `boostsPerColor` | `int` | `2` (Min: 0) | Number of boost spaces per color (Red, LightBlue, Yellow). **Requires complete board regeneration.** |
+| **Player** | `tilesPerPlayer` | `int` | `13` (Min: 1) | Number of tiles generated in each player's rack. **Requires complete tile rack regeneration.** |
+| **Tile Strength** | `minimumSideStrength` | `int` | `0` (Min: 0) | Lower bound on each of the 4 individual edge strengths. **Requires tile rack regeneration.** |
+| **Tile Strength** | `maximumSideStrength` | `int` | `4` (Min: 0) | Upper bound on each of the 4 individual edge strengths. **Requires tile rack regeneration.** |
+| **Tile Strength** | `minimumTotalTicks` | `int` | `7` (Min: 0) | Lower bound on the 4-edge tick sum. **Requires tile rack regeneration.** |
+| **Tile Strength** | `maximumTotalTicks` | `int` | `9` (Min: 0) | Upper bound on the 4-edge tick sum. **Requires tile rack regeneration.** |
+| **Boost Bonus** | `neutralBoostBonus` | `int` | `1` (Min: 0) | Numerical strength bonus granted by the neutral center space. Evaluated during combat calculations. |
+| **Boost Bonus** | `matchingColorBoostBonus`| `int` | `1` (Min: 0) | Numerical strength bonus granted by matching-color boost spaces. Evaluated during combat calculations. |
+
+### Configuration Lifecycle: Default Asset vs. Runtime In-Memory Copy
+1. **Immutable Project Asset:** The serialized asset [GameBalanceConfig.asset](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Config/GameBalanceConfig.asset) stored in `Assets/Scripts/Config/` represents the **immutable factory defaults**. It must never be written to or mutated at runtime to avoid dirtying project assets.
+2. **Runtime In-Memory Copy:** When the application starts, it creates a runtime clone of the configuration in memory (e.g., via `ScriptableObject.Instantiate(defaultConfig)`). All modifications made via the Settings UI operate strictly on this runtime instance.
+3. **Session Persistence:** Changes made in the Settings UI persist across matches during the current application session. When a new application session begins (restarting the game), the configuration reverts to the Inspector defaults. The UI also provides a dedicated "Reset to Defaults" button to restore factory settings on demand.
+4. **Reinitialization Boundary:** Any changes to variables marked *Requires match regeneration* must only take effect when starting a new match (or by clicking "Play Again" / "Start Game"). Applying structural settings mid-turn is prohibited to prevent desynchronization.
+
+---
+
+## 5. Tick Configuration Validation & Stability Safeguards
+
+### Vulnerability Analysis in [TileGenerator.cs](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Tile/TileGenerator.cs#L41-L77)
+Currently, `TileGenerator.RandomizeStrengths()` rolls 4 edge strengths uniformly from $[S_{\min}, S_{\max}]$ inside a `do-while` loop until their sum falls within $[T_{\min}, T_{\max}]$:
+```csharp
+do
+{
+    topStrength = Random.Range(balanceConfig.minimumSideStrength, balanceConfig.maximumSideStrength + 1);
+    rightStrength = Random.Range(balanceConfig.minimumSideStrength, balanceConfig.maximumSideStrength + 1);
+    bottomStrength = Random.Range(balanceConfig.minimumSideStrength, balanceConfig.maximumSideStrength + 1);
+    leftStrength = Random.Range(balanceConfig.minimumSideStrength, balanceConfig.maximumSideStrength + 1);
+    totalTicks = topStrength + rightStrength + bottomStrength + leftStrength;
+}
+while (totalTicks < balanceConfig.minimumTotalTicks || totalTicks > balanceConfig.maximumTotalTicks);
+```
+
+### Mathematical Feasibility Requirements
+Assuming all 4 sides are generated independently over $[S_{\min}, S_{\max}]$, the achievable sum of 4 sides spans $[4 \times S_{\min}, 4 \times S_{\max}]$.
+For the generation loop to be capable of terminating, this achievable range must intersect the configured tick limits $[T_{\min}, T_{\max}]$:
+1. $S_{\min} \le S_{\max}$
+2. $T_{\min} \le T_{\max}$
+3. $4 \times S_{\min} \le T_{\max}$ (the minimum possible 4-side sum cannot exceed the allowed maximum total).
+4. $4 \times S_{\max} \ge T_{\min}$ (the maximum possible 4-side sum must reach at least the allowed minimum total).
+
+### Distinction: Mathematical Feasibility vs. Full Range Reachability
+*Critical Distinction:* While the intersection $[4 \times S_{\min}, 4 \times S_{\max}] \cap [T_{\min}, T_{\max}] \neq \emptyset$ guarantees that *at least one* valid sum exists (preventing an infinite loop), it does **not** guarantee that *every* integer in $[T_{\min}, T_{\max}]$ can be formed.
+- *Example:* If $S_{\min} = 1, S_{\max} = 2$, achievable sums are strictly $[4..8]$. If a user configures $[T_{\min}=4, T_{\max}=10]$, the loop terminates normally because $[4..8]$ is accepted, but totals $9$ and $10$ will never be generated. The validation logic must document this behavior and ensure users are informed if parts of their configured range are mathematically unreachable.
+
+### Board Space Constraint
+In addition to tick math, the board must physically accommodate the requested boost spaces:
+$$3 \times \text{boostsPerColor} \le \text{boardSize}^2 - 1 \quad (\text{with } \text{boardSize} \ge 3)$$
+
+### UI Rejection & Hard Code Safeguard
+1. **UI Validation Behavior:** The Settings UI must evaluate all constraints jointly before applying changes. If an invalid or conflicting combination is entered, the UI must **reject the submission and display a clear, human-readable explanation** describing the exact conflict (e.g., *"Minimum side strength of 3 requires at least 12 total ticks, which exceeds the maximum total of 9"*). The system must **not** silently clamp or modify other settings without user consent.
+2. **Hard Code Safeguard (Loop Break):** To ensure stability even against unexpected edge cases, the eventual implementation of `TileGenerator.RandomizeStrengths()` must include a maximum iteration counter:
+   ```csharp
+   const int maxAttempts = 500;
+   int attempts = 0;
+   do {
+       // roll strengths...
+       attempts++;
+       if (attempts >= maxAttempts) {
+           Debug.LogError("TileGenerator: Exceeded maximum attempts. Falling back to deterministic safe tile.");
+           // Apply safe fallback values satisfying constraints
+           break;
+       }
+   } while (...);
+   ```
+
+---
+
+## 6. Game Initialization Sequence
 
 ```mermaid
 sequenceDiagram
@@ -83,7 +163,7 @@ sequenceDiagram
     Note over Unity,GD: Frame 0 Initialization
     Unity->>BG: Start()
     BG->>BG: GenerateBoard(): Instantiates 25 BoardSquare prefabs
-    BG->>BG: AssignBoostSpaces(): 1 center Neutral, 6 Colored boosts
+    BG->>BG: AssignBoostSpaces(): 1 center Neutral (playable), 6 Colored boosts
 
     Unity->>TS: Start()
     TS->>TS: SpawnPlayerTiles(): Instantiates 13 tiles per player
@@ -99,27 +179,11 @@ sequenceDiagram
     GD->>SM: Advance(state): BeginTurn -> SelectTile
 ```
 
-1. **`BoardGenerator.Start()` (Execution Order 0):**
-   - Reads `GameBalanceConfig.asset` (`boardSize = 5`, `squareSpacing = 2.0`).
-   - Calculates board center offset: `boardOffset = (5 - 1) * 2 / 2f = 4.0f`.
-   - Loops through 25 cells, instantiates [BoardSquare.prefab](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Prefabs/BoardSquare.prefab) at `(x, 0.3f, z)`, and initializes coordinates via [BoardSpace.Initialize(row, col)](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Board/BoardSpace.cs#L58-L62).
-   - Identifies center cell `[2, 2]` (a fully playable space) and sets `BoostType.Neutral` (purple).
-   - Shuffles remaining 24 spaces and assigns `BoostType.Red` (2), `BoostType.LightBlue` (2), and `BoostType.Yellow` (2).
-2. **`TileSpawner.Start()` (Execution Order 0):**
-   - Generates balanced colors for 13 tiles per player via `CreateBalancedColors()`.
-   - Spawns Player 1 row at $Z = -7.3$ and Player 2 row at $Z = 7.3$.
-   - Calls [TileGenerator.InitializeTickColor()](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scripts/Tile/TileGenerator.cs#L25-L39), which generates side strengths totaling 7–9 ticks and instantiates [Tick.prefab](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Prefabs/Tick.prefab) instances along tile edges.
-3. **`GameDriver.Start()` (Execution Order 1000):**
-   - Instantiates a new `GameState`.
-   - Calls `FindObjectsOfType<BoardSpace>()` to populate `state.BoardSpaces`.
-   - Calls `FindObjectsOfType<TileView>()` to populate `state.AllTiles` and assigns itself (`this`) to each tile via `tile.Initialize(tile.Owner, this)`.
-   - Calls `AdvanceAutomaticPhases()`, which invokes `TurnStateMachine.Advance(state)`, transitioning the starting state from `BeginTurn` to `SelectTile`.
-
 ---
 
-## 5. Scene Objects and Inspector References
+## 7. Scene Objects, Canvas Structure, and Planned UI Hierarchy
 
-Inspected from [Assets/Scenes/MainScene.unity](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scenes/MainScene.unity):
+Current hierarchy in [MainScene.unity](file:///C:/Users/oldha/OneDrive/Documents/CST-410/TacTile/Assets/Scenes/MainScene.unity) alongside planned UI additions:
 
 ```
 Hierarchy
@@ -129,129 +193,43 @@ Hierarchy
 ├── BoardBase (Transform, BoxCollider)
 ├── Board (Transform, BoardGenerator)
 │   ├── boardSquarePrefab -> Assets/Prefabs/BoardSquare.prefab
-│   ├── balanceConfig     -> Assets/Scripts/Config/GameBalanceConfig.asset
+│   ├── balanceConfig     -> Runtime Balance Instance (cloned from GameBalanceConfig.asset)
 │   └── squareSpacing     -> 2.0
 ├── TileManager (Transform, TileSpawner)
 │   ├── tilePrefab        -> Assets/Prefabs/Tile.prefab
-│   ├── balanceConfig     -> Assets/Scripts/Config/GameBalanceConfig.asset
+│   ├── balanceConfig     -> Runtime Balance Instance
 │   ├── tileSpacing       -> 2.25
 │   ├── playerOneZ        -> -7.3
 │   └── playerTwoZ        -> 7.3
 ├── GameManager (Transform, GameDriver)
-│   └── balanceConfig     -> Assets/Scripts/Config/GameBalanceConfig.asset
+│   └── balanceConfig     -> Runtime Balance Instance
 └── Canvas (RectTransform, Canvas, CanvasScaler, GraphicRaycaster)
-    └── ScoreboardPanel (RectTransform, Image, ScoreboardUI)
-        ├── player1NameText   -> Player1Name (TMP_Text)
-        ├── player1ScoreText  -> Player1Score (TMP_Text)
-        ├── player2NameText   -> Player2Name (TMP_Text)
-        ├── player2ScoreText  -> Player2Score (TMP_Text)
-        ├── activePlayerColor -> Yellow/Gold (1.0, 0.8, 0.2, 1.0)
-        └── inactivePlayerColor -> White (1.0, 1.0, 1.0, 1.0)
+    ├── ScoreboardPanel [Implemented] (ScoreboardUI)
+    │   ├── player1NameText, player1ScoreText
+    │   └── player2NameText, player2ScoreText
+    ├── MainMenuPanel [Planned] (MainMenuUI)
+    │   ├── PlayButton (starts match)
+    │   ├── SettingsButton (opens SettingsPanel)
+    │   └── RulesButton (opens RulesPanel)
+    ├── RulesPanel [Planned]
+    │   ├── RulesContentText (guide to grid, tiles, combat, boosts)
+    │   └── CloseRulesButton
+    ├── SettingsPanel [Planned] (SettingsUI)
+    │   ├── Sliders / Input Fields for all 9 balance variables
+    │   ├── ValidationErrorMessageText
+    │   ├── ApplyButton
+    │   ├── ResetToDefaultsButton
+    │   └── BackButton
+    └── VictoryScreenPanel [Planned] (VictoryScreenUI)
+        ├── WinnerAnnouncementText ("Player 1 Wins!" / "Player 2 Wins!" / "Draw!")
+        ├── FinalScoreSummaryText
+        ├── PlayAgainButton (triggers match restart)
+        └── ReturnToMenuButton (returns to MainMenuPanel)
 ```
 
 ---
 
-## 6. Execution Flows
-
-### 1. Tile Selection Flow
-```
-User clicks Tile (3D BoxCollider)
-  │
-  ▼
-TileView.OnMouseDown()
-  │
-  ▼
-GameDriver.TrySelectTile(TileView)
-  ├── IF CurrentPhase == PlaceTile AND tile is unplaced AND belongs to CurrentPlayer:
-  │     - Deselect previous tile: state.SelectedTile.SetSelected(false)
-  │     - Select new tile: state.SelectedTile = tile; tile.SetSelected(true) [Jiggle animation]
-  │     - Remain in PlaceTile phase
-  │
-  └── ELSE IF CurrentPhase == SelectTile:
-        - Query LegalMoveGenerator.GetLegalActions(state, CurrentPlayer)
-        - IF LegalAction(SelectTile, tile) exists:
-            - state.SelectedTile = tile; tile.SetSelected(true)
-            - TurnStateMachine.Advance(state) -> transitions to PlaceTile
-```
-
-### 2. Tile Placement and Reparenting Flow
-```
-User clicks BoardSpace (3D BoxCollider)
-  │
-  ▼
-BoardSpace.OnMouseDown()
-  │
-  ▼
-GameDriver.TryPlaceTile(BoardSpace)
-  │
-  ▼
-Query LegalMoveGenerator.GetLegalActions(state, CurrentPlayer)
-  │
-  ▼
-IF LegalAction(PlaceTile, space) exists:
-  │
-  ├── BoardSpace.TryPlaceTile(placedTile):
-  │     - OccupyingTile = placedTile
-  │     - placedTile.MarkAsPlaced(space) [IsPlaced = true, SetSelected(false) stops Jiggle]
-  │     - placedTile.transform.SetParent(space.transform)
-  │     - placedTile.transform.position = space.position + (Vector3.up * 0.25f)
-  │     - placedTile.transform.rotation = space.rotation
-  │
-  ├── GameDriver.ResolveCaptures(placedTile, space) [Executes combat against neighbors]
-  │
-  └── TurnStateMachine.Advance(state) [Transitions PlaceTile -> EndTurn]
-        │
-        ▼
-      GameDriver.AdvanceAutomaticPhases()
-        - Advances EndTurn: CompletedTurns++, toggles CurrentPlayer, clears SelectedTile
-        - Advances BeginTurn -> transitions into SelectTile for next player
-```
-
-### 3. Combat and Capture Flow
-```
-GameDriver.ResolveCaptures(placedTile, placedSpace)
-  │
-  ├── Check Top neighbor:    [Row + 1, Col] -> Attacker Top    vs Defender Bottom
-  ├── Check Right neighbor:  [Row, Col + 1] -> Attacker Right  vs Defender Left
-  ├── Check Bottom neighbor: [Row - 1, Col] -> Attacker Bottom vs Defender Top
-  └── Check Left neighbor:   [Row, Col - 1] -> Attacker Left   vs Defender Right
-        │
-        ▼
-  For each neighbor that exists, is occupied, and belongs to OPPONENT:
-    - AttackingStrength = GetEffectiveStrength(attacker, attackingSide)
-    - DefendingStrength = GetEffectiveStrength(defender, defendingSide)
-        │
-        ├─ Base strength from TileGenerator (0..4 ticks)
-        ├─ If on Neutral Boost Space: +1 bonus (neutralBoostBonus)
-        └─ If on Matching Color Boost Space: +1 bonus (matchingColorBoostBonus)
-        │
-        ▼
-    IF AttackingStrength > DefendingStrength:
-      - Defender captured!
-      - defenderTile.SetOwner(attacker.Owner)
-      - MaterialPropertyBlock updates defender mesh to attacker's color
-```
-
-### 4. Live Scoring Update Flow
-```
-ScoreboardUI.Update() [Runs every frame]
-  │
-  ▼
-Queries GameDriver.Instance.State
-  │
-  ▼
-Loops through state.AllTiles:
-  - If tile is placed AND Owner == Player1 -> player1Score++
-  - If tile is placed AND Owner == Player2 -> player2Score++
-  │
-  ▼
-If scores changed: update TMP_Text components
-If active player changed: update player name text colors
-```
-
----
-
-## 7. Verified Facts vs. Assumptions
+## 8. Verified Facts vs. Assumptions
 
 ### Verified Implementation Facts
 1. **No Standalone CombatManager or TurnManager:** Combat logic resides entirely in `GameDriver.cs`. Turn logic is split between static `TurnStateMachine.cs` and `GameDriver.cs`.
@@ -259,6 +237,7 @@ If active player changed: update player name text colors
 3. **Intentional Tile Count:** Each player receives 13 tiles. The board contains 25 playable spaces, including the center neutral purple boost space. Therefore, when the board is full, exactly one tile remains unused overall. Which player retains that tile depends on placement order.
 4. **Input Architecture:** Uses legacy `OnMouseDown()` on 3D physics BoxColliders. It does not use the New Input System actions despite the package being installed.
 5. **Scoreboard Polling:** `ScoreboardUI.Update()` counts placed tiles every frame via a `foreach` loop over `state.AllTiles`.
+6. **Tick Generation Freeze Risk:** `TileGenerator.RandomizeStrengths()` uses an unguarded `do-while` loop that will freeze the Unity thread if impossible constraints are provided.
 
 ### Assumptions (Identified for Verification)
 1. **Input Touch Behavior on Mobile:** Unity emulates mouse clicks from single touches on mobile devices, which allows basic `OnMouseDown()` taps to work in standard scenarios. However, this has not been validated on a physical device build and lacks multi-touch or touch-cancellation handling.
