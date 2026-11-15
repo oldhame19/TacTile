@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameBalanceConfig
   boardSize: 5
   boostsPerColor: 2
-  tilesPerPlayer: 8
+  tilesPerPlayer: 13
   minimumSideStrength: 0
   maximumSideStrength: 4
   minimumTotalTicks: 7

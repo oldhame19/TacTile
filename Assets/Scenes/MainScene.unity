@@ -1014,9 +1014,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BoardGenerator
   boardSquarePrefab: {fileID: 2126349778975583809, guid: e50fb65bd7f0a2e40ab7f8c4d5360446, type: 3}
-  boardSize: 5
+  balanceConfig: {fileID: 11400000, guid: 41ec694ed92761547bc75b4580647b44, type: 2}
   squareSpacing: 2
-  boostsPerColor: 2
 --- !u!4 &1175448165
 Transform:
   m_ObjectHideFlags: 0
@@ -1300,6 +1299,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51a28e862187d7849a5c6cf013ba91a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameDriver
+  balanceConfig: {fileID: 11400000, guid: 41ec694ed92761547bc75b4580647b44, type: 2}
 --- !u!4 &1282333536
 Transform:
   m_ObjectHideFlags: 0
@@ -1345,7 +1345,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TileSpawner
   tilePrefab: {fileID: 8053936220073287214, guid: a4b2e198466c4b44fa283a8325adc634, type: 3}
-  tilesPerPlayer: 13
+  balanceConfig: {fileID: 11400000, guid: 41ec694ed92761547bc75b4580647b44, type: 2}
   tileSpacing: 2.25
   playerOneZ: -7.3
   playerTwoZ: 7.3
