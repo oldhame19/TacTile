@@ -1,11 +1,14 @@
 
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 [DefaultExecutionOrder(1000)]
 public class GameDriver : MonoBehaviour
 {
     public static GameDriver Instance { get; private set; }
+    public event Action<PlayerId?, int, int> OnGameOver;
     [SerializeField] private GameBalanceConfig balanceConfig;
 
     private GameState state;
@@ -402,6 +405,13 @@ public class GameDriver : MonoBehaviour
             );
         }
         Debug.Log("===============================");
+
+        OnGameOver?.Invoke(winner, p1Score, p2Score);
+    }
+
+    public void RestartMatch()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     private void AdvanceAutomaticPhases()
