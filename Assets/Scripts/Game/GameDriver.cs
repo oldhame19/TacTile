@@ -72,7 +72,7 @@ public class GameDriver : MonoBehaviour
 
     public void TrySelectTile(TileView tile)
     {
-        if (state == null || tile == null)
+        if (state == null || state.IsGameOver || tile == null)
         {
             return;
         }
@@ -142,7 +142,7 @@ public class GameDriver : MonoBehaviour
 
     public void TryPlaceTile(BoardSpace space)
     {
-        if (state == null || space == null)
+        if (state == null || state.IsGameOver || space == null)
         {
             return;
         }
@@ -177,6 +177,12 @@ public class GameDriver : MonoBehaviour
 
                 // Resolve captures immediately after placement.
                 ResolveCaptures(placedTile, space);
+
+                if (state.IsGameOver)
+                {
+                    HandleGameOver();
+                    return;
+                }
 
                 if (TurnStateMachine.Advance(state))
                 {
@@ -375,9 +381,33 @@ public class GameDriver : MonoBehaviour
             : baseStrength;
     }
 
+    private void HandleGameOver()
+    {
+        PlayerId? winner = state.GetWinner(out int p1Score, out int p2Score);
+
+        Debug.Log("========== GAME OVER ==========");
+        if (winner.HasValue)
+        {
+            Debug.Log(
+                "Winner: " + winner.Value +
+                " | Final Score - Player 1: " + p1Score +
+                ", Player 2: " + p2Score
+            );
+        }
+        else
+        {
+            Debug.Log(
+                "Match ended in a DRAW | Final Score - Player 1: " +
+                p1Score + ", Player 2: " + p2Score
+            );
+        }
+        Debug.Log("===============================");
+    }
+
     private void AdvanceAutomaticPhases()
     {
         while (state != null &&
+               !state.IsGameOver &&
                (state.CurrentPhase == TurnPhase.BeginTurn ||
                 state.CurrentPhase == TurnPhase.EndTurn))
         {
