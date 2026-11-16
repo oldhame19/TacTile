@@ -22,28 +22,62 @@ public class TileGenerator : MonoBehaviour
     }
 
 
-    public void InitializeTickColor(
-    TickColor color,
-    GameBalanceConfig config)
+    public bool InitializeTickColor(
+        TickColor color,
+        GameBalanceConfig config)
     {
+        if (config == null)
+        {
+            Debug.LogError(
+                $"[TileGenerator] GameBalanceConfig passed to {name} is null.",
+                this
+            );
+            return false;
+        }
+
         tileTickColor = color;
         balanceConfig = config;
 
         if (ticksGenerated)
-            return;
+            return true;
 
-        RandomizeStrengths();
-        GenerateTicks();
+        if (tickPrefab == null)
+        {
+            Debug.LogError(
+                $"[TileGenerator] tickPrefab is null on {name}.",
+                this
+            );
+            return false;
+        }
+
+        if (tickPrefab.GetComponent<TickView>() == null)
+        {
+            Debug.LogError(
+                $"[TileGenerator] tickPrefab is missing TickView component on {name}.",
+                this
+            );
+            return false;
+        }
+
+        if (!RandomizeStrengths())
+            return false;
+
+        if (!GenerateTicks())
+            return false;
 
         ticksGenerated = true;
+        return true;
     }
 
-    private void RandomizeStrengths()
+    private bool RandomizeStrengths()
     {
-        int totalTicks;
+        const int maxAttempts = 500;
+        int attempts = 0;
 
-        do
+        while (attempts < maxAttempts)
         {
+            attempts++;
+
             topStrength = Random.Range(
                 balanceConfig.minimumSideStrength,
                 balanceConfig.maximumSideStrength + 1
@@ -64,30 +98,43 @@ public class TileGenerator : MonoBehaviour
                 balanceConfig.maximumSideStrength + 1
             );
 
-            totalTicks =
-                topStrength +
+            long totalTicks =
+                (long)topStrength +
                 rightStrength +
                 bottomStrength +
                 leftStrength;
+
+            if (totalTicks >= (long)balanceConfig.minimumTotalTicks &&
+                totalTicks <= (long)balanceConfig.maximumTotalTicks)
+            {
+                return true;
+            }
         }
-        while (
-            totalTicks < balanceConfig.minimumTotalTicks ||
-            totalTicks > balanceConfig.maximumTotalTicks
+
+        Debug.LogError(
+            $"[TileGenerator] Failed to generate valid strengths for {name} after {maxAttempts} attempts " +
+            $"with side bounds [{balanceConfig.minimumSideStrength}, {balanceConfig.maximumSideStrength}] " +
+            $"and total bounds [{balanceConfig.minimumTotalTicks}, {balanceConfig.maximumTotalTicks}].",
+            this
         );
+
+        return false;
     }
 
-    private void GenerateTicks()
+    private bool GenerateTicks()
     {
-        GenerateEdgeTicks(topStrength, Edge.Top);
-        GenerateEdgeTicks(rightStrength, Edge.Right);
-        GenerateEdgeTicks(bottomStrength, Edge.Bottom);
-        GenerateEdgeTicks(leftStrength, Edge.Left);
+        if (!GenerateEdgeTicks(topStrength, Edge.Top)) return false;
+        if (!GenerateEdgeTicks(rightStrength, Edge.Right)) return false;
+        if (!GenerateEdgeTicks(bottomStrength, Edge.Bottom)) return false;
+        if (!GenerateEdgeTicks(leftStrength, Edge.Left)) return false;
+
+        return true;
     }
 
-    private void GenerateEdgeTicks(int tickCount, Edge edge)
+    private bool GenerateEdgeTicks(int tickCount, Edge edge)
     {
         if (tickCount == 0)
-            return;
+            return true;
 
         float startOffset =
             -((tickCount - 1) * tickSpacing) / 2f;
@@ -122,7 +169,7 @@ public class TileGenerator : MonoBehaviour
                     break;
 
                 default:
-                    return;
+                    return false;
             }
 
             GameObject tick = Instantiate(tickPrefab, transform);
@@ -141,12 +188,15 @@ public class TileGenerator : MonoBehaviour
                     tick
                 );
 
-                continue;
+                Destroy(tick);
+                return false;
             }
 
             // Every tick on this tile receives the same color.
             tickView.Initialize(tileTickColor);
         }
+
+        return true;
     }
 
     private enum Edge

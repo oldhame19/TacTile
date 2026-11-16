@@ -22,18 +22,64 @@ public class TileSpawner : MonoBehaviour
     {
         if (balanceConfig == null)
         {
-            Debug.LogError("GameBalanceConfig is not assigned!", this);
+            Debug.LogError("[TileSpawner] GameBalanceConfig is not assigned!", this);
+            DisableGameDriver();
             return;
         }
 
-        SpawnTileRow(playerOneZ, PlayerId.Player1, "Player1");
-        SpawnTileRow(playerTwoZ, PlayerId.Player2, "Player2");
+        if (!balanceConfig.ValidateConfig(out string errorMessage))
+        {
+            Debug.LogError(
+                $"[TileSpawner] GameBalanceConfig validation failed: {errorMessage}. Aborting tile spawning.",
+                this
+            );
+            DisableGameDriver();
+            return;
+        }
+
+        if (tilePrefab == null)
+        {
+            Debug.LogError("[TileSpawner] tilePrefab is not assigned!", this);
+            DisableGameDriver();
+            return;
+        }
+
+        if (tilePrefab.GetComponent<TileGenerator>() == null)
+        {
+            Debug.LogError("[TileSpawner] tilePrefab is missing TileGenerator component!", this);
+            DisableGameDriver();
+            return;
+        }
+
+        if (tilePrefab.GetComponent<TileView>() == null)
+        {
+            Debug.LogError("[TileSpawner] tilePrefab is missing TileView component!", this);
+            DisableGameDriver();
+            return;
+        }
+
+        List<GameObject> currentSpawnedTiles = new List<GameObject>();
+
+        if (!SpawnTileRow(playerOneZ, PlayerId.Player1, "Player1", currentSpawnedTiles))
+        {
+            CleanupSpawnedTiles(currentSpawnedTiles);
+            DisableGameDriver();
+            return;
+        }
+
+        if (!SpawnTileRow(playerTwoZ, PlayerId.Player2, "Player2", currentSpawnedTiles))
+        {
+            CleanupSpawnedTiles(currentSpawnedTiles);
+            DisableGameDriver();
+            return;
+        }
     }
 
-    private void SpawnTileRow(
+    private bool SpawnTileRow(
         float zPosition,
         PlayerId owner,
-        string playerName)
+        string playerName,
+        List<GameObject> currentSpawnedTiles)
     {
         float startX =
             -((balanceConfig.tilesPerPlayer - 1) * tileSpacing) / 2f;
@@ -59,24 +105,27 @@ public class TileSpawner : MonoBehaviour
             );
 
             tile.name = $"{playerName}_Tile_{i}";
+            currentSpawnedTiles.Add(tile);
 
-            // Assign one color to all ticks on this tile.
             TileGenerator tileGenerator =
                 tile.GetComponent<TileGenerator>();
 
             if (tileGenerator == null)
             {
                 Debug.LogError(
-                    "Tile prefab needs TileGenerator.cs",
+                    "[TileSpawner] Tile instance missing TileGenerator.",
                     tile
                 );
+                return false;
             }
-            else
+
+            if (!tileGenerator.InitializeTickColor(colors[i], balanceConfig))
             {
-                tileGenerator.InitializeTickColor(
-                    colors[i],
-                    balanceConfig
+                Debug.LogError(
+                    $"[TileSpawner] Tile initialization failed for {tile.name}. Aborting tile spawning.",
+                    tile
                 );
+                return false;
             }
 
             TileView tileView = tile.GetComponent<TileView>();
@@ -84,15 +133,40 @@ public class TileSpawner : MonoBehaviour
             if (tileView == null)
             {
                 Debug.LogError(
-                    "Tile prefab needs TileView.cs",
+                    "[TileSpawner] Tile instance missing TileView.",
                     tile
                 );
-
-                continue;
+                return false;
             }
 
             // The GameDriver connects the tiles after scene setup.
             tileView.Initialize(owner, null);
+        }
+
+        return true;
+    }
+
+    private void CleanupSpawnedTiles(List<GameObject> spawnedTiles)
+    {
+        if (spawnedTiles == null)
+            return;
+
+        foreach (GameObject tile in spawnedTiles)
+        {
+            if (tile != null)
+            {
+                Destroy(tile);
+            }
+        }
+
+        spawnedTiles.Clear();
+    }
+
+    private void DisableGameDriver()
+    {
+        if (GameDriver.Instance != null)
+        {
+            GameDriver.Instance.enabled = false;
         }
     }
 

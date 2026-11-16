@@ -59,8 +59,39 @@ public class GameState
         get
         {
             return GetEmptySpaces().Count == 0 ||
-                   GetPlayerTiles(PlayerId.Player1).Count == 0 &&
-                   GetPlayerTiles(PlayerId.Player2).Count == 0;
+                   (GetPlayerTiles(PlayerId.Player1).Count == 0 &&
+                    GetPlayerTiles(PlayerId.Player2).Count == 0);
         }
+    }
+
+    public int GetPlayerScore(PlayerId player)
+    {
+        int score = 0;
+        foreach (TileView tile in AllTiles)
+        {
+            if (tile != null && tile.IsPlaced && tile.Owner == player)
+            {
+                score++;
+            }
+        }
+        return score;
+    }
+
+    public PlayerId? GetWinner(out int player1Score, out int player2Score)
+    {
+        player1Score = GetPlayerScore(PlayerId.Player1);
+        player2Score = GetPlayerScore(PlayerId.Player2);
+
+        if (player1Score > player2Score)
+        {
+            return PlayerId.Player1;
+        }
+
+        if (player2Score > player1Score)
+        {
+            return PlayerId.Player2;
+        }
+
+        return null;
     }
 }
