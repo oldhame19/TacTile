@@ -144,4 +144,54 @@ public class BoardSpace : MonoBehaviour
 
         return true;
     }
+    public bool TryGetBoostHighlightColor(
+    TileView tile,
+    out Color highlightColor)
+    {
+        highlightColor = Color.clear;
+
+        if (tile == null || !IsBoostSpace)
+            return false;
+
+        if (Boost == BoostType.Neutral)
+        {
+            highlightColor = neutralColor;
+            return true;
+        }
+
+        TileGenerator generator = tile.GetComponent<TileGenerator>();
+
+        if (generator == null)
+            return false;
+
+        bool matches =
+            (Boost == BoostType.Red &&
+             generator.TileTickColor == TickColor.Red) ||
+
+            (Boost == BoostType.LightBlue &&
+             generator.TileTickColor == TickColor.LightBlue) ||
+
+            (Boost == BoostType.Yellow &&
+             generator.TileTickColor == TickColor.Yellow);
+
+        if (!matches)
+            return false;
+
+        switch (Boost)
+        {
+            case BoostType.Red:
+                highlightColor = redColor;
+                break;
+
+            case BoostType.LightBlue:
+                highlightColor = lightBlueColor;
+                break;
+
+            case BoostType.Yellow:
+                highlightColor = yellowColor;
+                break;
+        }
+
+        return true;
+    }
 }

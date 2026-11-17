@@ -172,6 +172,17 @@ public class GameDriver : MonoBehaviour
                     return;
                 }
 
+                if (space.TryGetBoostHighlightColor(
+                    placedTile,
+                    out Color highlightColor))
+                {
+                    placedTile.SetBoostHighlight(true, highlightColor);
+                }
+                else
+                {
+                    placedTile.SetBoostHighlight(false, Color.clear);
+                }
+
                 Debug.Log(
                     state.CurrentPlayer + " placed " +
                     placedTile.name + " at [" +

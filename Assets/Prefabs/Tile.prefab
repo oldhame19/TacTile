@@ -147,3 +147,8 @@ MonoBehaviour:
   tileRenderer: {fileID: 2248674653031377166}
   playerOneColor: {r: 1, g: 1, b: 1, a: 1}
   playerTwoColor: {r: 0, g: 0, b: 0, a: 1}
+  jiggleAngle: 5
+  jiggleSpeed: 18
+  boostPulseSpeed: 2.5
+  playerOneHighlightIntensity: 0.6
+  playerTwoHighlightIntensity: 0.35
