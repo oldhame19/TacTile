@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class VictoryUI : MonoBehaviour
@@ -12,6 +13,9 @@ public class VictoryUI : MonoBehaviour
     [Header("Buttons")]
     [SerializeField] private Button playAgainButton;
     [SerializeField] private Button returnToMenuButton;
+
+    [Header("Scene Navigation")]
+    [SerializeField] private string mainMenuSceneName = "MainMenu";
 
     private bool isSubscribed;
 
@@ -148,6 +152,12 @@ public class VictoryUI : MonoBehaviour
 
     private void OnReturnToMenuClicked()
     {
-        Debug.Log("[VictoryUI] Return to Menu is a placeholder for Milestone 4 (Main Menu).");
+        if (string.IsNullOrEmpty(mainMenuSceneName))
+        {
+            Debug.LogError("[VictoryUI] Cannot return to main menu: mainMenuSceneName is not set.", this);
+            return;
+        }
+
+        SceneManager.LoadScene(mainMenuSceneName);
     }
 }
