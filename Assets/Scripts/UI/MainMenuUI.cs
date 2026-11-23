@@ -13,6 +13,24 @@ public class MainMenuUI : MonoBehaviour
     [SerializeField] private Button settingsButton;
     [SerializeField] private Button quitButton;
 
+    [Header("Panels")]
+    [SerializeField] private GameObject menuContainer;
+    [SerializeField] private GameObject rulesPanel;
+    [SerializeField] private Button rulesBackButton;
+
+    private void Start()
+    {
+        if (rulesPanel != null)
+        {
+            rulesPanel.SetActive(false);
+        }
+
+        if (menuContainer != null)
+        {
+            menuContainer.SetActive(true);
+        }
+    }
+
     private void OnEnable()
     {
         if (playButton != null)
@@ -54,6 +72,16 @@ public class MainMenuUI : MonoBehaviour
         {
             Debug.LogWarning("[MainMenuUI] Quit button reference is not assigned.", this);
         }
+
+        if (rulesBackButton != null)
+        {
+            rulesBackButton.onClick.RemoveListener(OnRulesBackClicked);
+            rulesBackButton.onClick.AddListener(OnRulesBackClicked);
+        }
+        else
+        {
+            Debug.LogWarning("[MainMenuUI] Rules back button reference is not assigned.", this);
+        }
     }
 
     private void OnDisable()
@@ -77,6 +105,11 @@ public class MainMenuUI : MonoBehaviour
         {
             quitButton.onClick.RemoveListener(OnQuitClicked);
         }
+
+        if (rulesBackButton != null)
+        {
+            rulesBackButton.onClick.RemoveListener(OnRulesBackClicked);
+        }
     }
 
     private void OnPlayClicked()
@@ -93,7 +126,28 @@ public class MainMenuUI : MonoBehaviour
 
     private void OnRulesClicked()
     {
-        Debug.Log("[MainMenuUI] Rules screen will be implemented in Milestone 4.2.");
+        if (menuContainer != null)
+        {
+            menuContainer.SetActive(false);
+        }
+
+        if (rulesPanel != null)
+        {
+            rulesPanel.SetActive(true);
+        }
+    }
+
+    private void OnRulesBackClicked()
+    {
+        if (rulesPanel != null)
+        {
+            rulesPanel.SetActive(false);
+        }
+
+        if (menuContainer != null)
+        {
+            menuContainer.SetActive(true);
+        }
     }
 
     private void OnSettingsClicked()
